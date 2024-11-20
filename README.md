@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GitHub Markdown Renderer
 
-## Getting Started
+Aplikasi web untuk mengkonversi dan menampilkan file markdown dari GitHub dengan tampilan yang menarik. Dibangun menggunakan Next.js 14, TypeScript, dan Tailwind CSS.
 
-First, run the development server:
+## Fitur
 
+- Konversi URL GitHub ke raw URL
+- Render markdown dengan dukungan GitHub Flavored Markdown (GFM)
+- Tampilan gambar dan GIF yang responsif
+- Navigasi anchor links yang smooth
+- Server-side rendering untuk performa optimal
+- Tombol "Back to Top" untuk navigasi mudah
+- Tampilan responsif untuk semua ukuran layar
+
+## Teknologi yang Digunakan
+
+- [Next.js 14](https://nextjs.org/) - React framework
+- [TypeScript](https://www.typescriptlang.org/) - JavaScript dengan type system
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Remark](https://github.com/remarkjs/remark) - Markdown processor
+- [@tailwindcss/typography](https://tailwindcss.com/docs/typography-plugin) - Plugin untuk styling konten markdown
+
+## Cara Penggunaan
+
+1. Clone repository ini
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [url-repository]
+cd markdown-render
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependensi
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Jalankan development server
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Buka [http://localhost:3000](http://localhost:3000) di browser
 
-## Learn More
+5. Masukkan URL GitHub markdown (contoh: https://github.com/user/repo/blob/main/README.md)
 
-To learn more about Next.js, take a look at the following resources:
+## Fitur Markdown yang Didukung
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Heading dan subheading
+- Link dan anchor navigation
+- Gambar dan GIF animasi
+- Tabel (GitHub Flavored Markdown)
+- List (ordered dan unordered)
+- Code blocks
+- Dan semua fitur markdown standar lainnya
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Struktur Proyek
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+markdown-render/
+├── app/
+│   ├── page.tsx                    # Halaman utama dengan form input
+│   └── render/
+│       ├── page.tsx                # Server component untuk render markdown
+│       └── markdown-renderer.tsx   # Client component untuk tampilan
+├── public/
+└── ...
+```
