@@ -1,5 +1,6 @@
-'use server';
+'use client';
 
+import { useState, useEffect } from 'react';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
@@ -51,12 +52,56 @@ async function markdownToHtml(markdown: string) {
   return result.toString();
 }
 
-export default async function RenderPage({
-  searchParams,
-}: {
-  searchParams: { url: string };
-}) {
-  const { url } = searchParams;
+export default function RenderPage() {
+  const [url, setUrl] = useState<string>('');
+  const [htmlContent, setHtmlContent] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get URL from query parameters on component mount
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get('url');
+    if (urlParam) {
+      setUrl(urlParam);
+    }
+  }, []);
+
+  useEffect(() => {
+    async function loadContent() {
+      if (!url) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const markdown = await fetchMarkdown(url);
+        const baseUrl = getBaseUrl(url);
+        const markdownWithAbsoluteUrls = convertImageUrls(markdown, baseUrl);
+        let content = await markdownToHtml(markdownWithAbsoluteUrls);
+
+        // Add id attributes to headings for anchor links
+        content = content.replace(
+          /<h([1-6])>([^<]+)<\/h[1-6]>/g,
+          (match, level, text) => {
+            const id = text
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)/g, '');
+            return `<h${level} id="${id}">${text}</h${level}>`;
+          }
+        );
+
+        setHtmlContent(content);
+      } catch {
+        setError('Failed to load or render markdown content');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadContent();
+  }, [url]);
 
   if (!url) {
     return (
@@ -76,22 +121,33 @@ export default async function RenderPage({
     );
   }
 
-  const markdown = await fetchMarkdown(url);
-  const baseUrl = getBaseUrl(url);
-  const markdownWithAbsoluteUrls = convertImageUrls(markdown, baseUrl);
-  let htmlContent = await markdownToHtml(markdownWithAbsoluteUrls);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center">
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Add id attributes to headings for anchor links
-  htmlContent = htmlContent.replace(
-    /<h([1-6])>([^<]+)<\/h[1-6]>/g,
-    (match, level, text) => {
-      const id = text
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      return `<h${level} id="${id}">${text}</h${level}>`;
-    }
-  );
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4">
+            <div className="flex">
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return <MarkdownRenderer htmlContent={htmlContent} />;
 }
